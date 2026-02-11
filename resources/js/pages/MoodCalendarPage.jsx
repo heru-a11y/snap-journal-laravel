@@ -1,5 +1,5 @@
 import React from "react";
-import MoodCalendar from "../Components/MoodCalendar";
+import MoodCalendar from "../components/MoodCalendar";
 import { router } from "@inertiajs/react";
 
 export default function MoodCalendarPage({ month, calendar }) {

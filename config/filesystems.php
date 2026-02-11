@@ -46,9 +46,11 @@ return [
         ],
             'gcs' => [
             'driver' => 'gcs',
-            'project_id' => env('GOOGLE_CLOUD_PROJECT_ID', 'bamboo-host-471003-r9'),
-            'key_file' => env('GOOGLE_CLOUD_KEY_FILE', null),
-            'bucket' => env('GOOGLE_CLOUD_STORAGE_BUCKET', 'journal-ai-btj'),
+            'project_id' => env('GOOGLE_CLOUD_PROJECT_ID', 'snap-journal-laravel'),
+            'key_file' => env('GOOGLE_CREDENTIALS_BASE64') 
+                ? json_decode(base64_decode(env('GOOGLE_CREDENTIALS_BASE64')), true) 
+                : 'storage/app/google/my-project-credentials.json',
+            'bucket' => env('GOOGLE_CLOUD_STORAGE_BUCKET', 'snapjournal-storage-laravel'),
             'path_prefix' => env('GOOGLE_CLOUD_STORAGE_PATH_PREFIX', ''),
             'predefinedAcl' => null,
             'visibility' => 'public',

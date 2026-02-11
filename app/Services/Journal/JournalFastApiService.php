@@ -17,17 +17,20 @@ class JournalFastApiService
         $this->apiKey       = env("FASTAPI_KEY");
     }
 
-   private function post($baseUrl, $endpoint, $payload)
-{
-    $url = rtrim($baseUrl, '/') . '/' . ltrim($endpoint, '/');
+    private function post($baseUrl, $endpoint, $payload)
+    {
+        // Langsung return null untuk mematikan koneksi ke API
+        return null;
 
-    return Http::withHeaders([
-        "x-api-key" => $this->apiKey,
-        "Date" => now()->toIso8601String()
-    ])->post($url, $payload)->json();
-}
+        /* CODE ASLI DIMATIKAN (COMMENTED OUT)
+        $url = rtrim($baseUrl, '/') . '/' . ltrim($endpoint, '/');
 
-
+        return Http::withHeaders([
+            "x-api-key" => $this->apiKey,
+            "Date" => now()->toIso8601String()
+        ])->post($url, $payload)->json();
+        */
+    }
 
     public function predictVideo($videoUrl)
     {
@@ -71,14 +74,12 @@ class JournalFastApiService
         ]);
     }
 
-   public function elaboration(array $payload)
-{
-    return $this->post(
-        $this->textBaseUrl,
-        "/elaboration-chat",
-        $payload
-    );
-}
-
-
+    public function elaboration(array $payload)
+    {
+        return $this->post(
+            $this->textBaseUrl,
+            "/elaboration-chat",
+            $payload
+        );
+    }
 }

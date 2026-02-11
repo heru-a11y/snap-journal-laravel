@@ -11,11 +11,30 @@ class GoogleStorageService
 
     public function __construct()
     {
-        $this->storage = new StorageClient([
-            'projectId' => env('GOOGLE_CLOUD_PROJECT_ID', 'snap-journal-510e0'),
-            'keyFilePath' => env('GOOGLE_CLOUD_KEY_FILE', 'C:\\Users\\Al Fihra\\AppData\\Roaming\\gcloud\\application_default_credentials.json'),
-            'suppressKeyFileNotice' => true,
-        ]);
+        $config = [
+                'projectId' => env('GOOGLE_CLOUD_PROJECT_ID', 'snap-journal-510e0'),
+                'suppressKeyFileNotice' => true,
+            ];
+
+        if (env('GOOGLE_CREDENTIALS_BASE64')) {
+            $jsonKey = base64_decode(env('GOOGLE_CREDENTIALS_BASE64'));
+            $decodedKey = json_decode($jsonKey, true);
+            
+            if (is_array($decodedKey)) {
+                $config['keyFile'] = $decodedKey;
+            } else {
+                Log::error('GOOGLE_CREDENTIALS_BASE64 ditemukan tapi format JSON salah.');
+            }
+        } elseif (env('GOOGLE_CLOUD_KEY_FILE') && file_exists(env('GOOGLE_CLOUD_KEY_FILE'))) {
+            // 2. Fallback Lokal: Baca dari file fisik jika ada
+            $config['keyFilePath'] = env('GOOGLE_CLOUD_KEY_FILE');
+        } else {
+            // 3. Fallback Terakhir: Path default (Hati-hati dengan path Windows di Linux)
+            // Sebaiknya dihapus atau dikosongkan untuk Cloud Run
+            // $config['keyFilePath'] = '...'; 
+        }
+
+        $this->storage = new StorageClient($config);
     }
 
     public function uploadBase64($base64File, $userId, $journalId)

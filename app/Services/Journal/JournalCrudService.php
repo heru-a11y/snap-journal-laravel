@@ -241,38 +241,57 @@ public function chatAsk(Journal $journal, Request $request)
             ->get()
             ->groupBy(fn($j) => $j->created_at->format('Y-m-d'));
 
-    $calendar = [];
+        $calendar = [];
 
-    foreach ($period as $date) {
-        $day = $date->format('Y-m-d');
+        foreach ($period as $date) {
+            $day = $date->format('Y-m-d');
 
-        if (!isset($journals[$day])) {
-            $calendar[$day] = [
-                "has_entry" => false,
-                "expression" => null,
-                "expressions" => [],
-            ];
-            continue;
+            // 1. Jika tidak ada jurnal hari itu
+            if (!isset($journals[$day])) {
+                $calendar[$day] = [
+                    "has_entry" => false,
+                    "expression" => null,
+                    "expressions" => [],
+                ];
+                continue;
+            }
+
+            // --- PERBAIKAN DIMULAI DI SINI ---
+            
+            // 2. Ambil expression, TAPI buang yang null atau kosong
+            $expressions = $journals[$day]
+                ->pluck('expression')
+                ->filter(fn($val) => !is_null($val) && $val !== '') 
+                ->values() // Reset index array agar rapi
+                ->toArray();
+
+            // 3. Cek apakah setelah difilter datanya kosong? (Misal semua jurnal hari itu belum ada hasil AI)
+            if (empty($expressions)) {
+                $calendar[$day] = [
+                    "has_entry" => true,
+                    "expression" => null, // Tetap null agar tidak error
+                    "expressions" => [],
+                ];
+            } else {
+                // 4. Hitung frekuensi (Aman karena sudah dipastikan string semua)
+                $freq = array_count_values($expressions);
+                arsort($freq);
+                $dominant = array_key_first($freq);
+
+                $calendar[$day] = [
+                    "has_entry" => true,
+                    "expression" => strtolower($dominant),
+                    "expressions" => $expressions,
+                ];
+            }
+            // --- PERBAIKAN SELESAI ---
         }
 
-        $expressions = $journals[$day]->pluck('expression')->toArray();
-
-        $freq = array_count_values($expressions);
-        arsort($freq);
-        $dominant = array_key_first($freq);
-
-        $calendar[$day] = [
-            "has_entry" => true,
-            "expression" => strtolower($dominant),
-            "expressions" => $expressions,
+        return [
+            "month" => $month,
+            "calendar" => $calendar
         ];
     }
-
-    return [
-        "month" => $month,
-        "calendar" => $calendar
-    ];
-}
 
     private function extractPath($url)
     {

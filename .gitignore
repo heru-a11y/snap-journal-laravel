@@ -24,5 +24,3 @@ yarn-error.log
 /.zed
 "node_modules/" 
 /storage/app/google/my-project-credentials.json
-/public/firebase-messaging-sw.js
-/resources/js/firebase.js

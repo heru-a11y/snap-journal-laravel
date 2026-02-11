@@ -1,0 +1,8 @@
+[
+  {
+    "origin": ["https://snap-journal-app-870206383777.asia-southeast2.run.app"],
+    "method": ["GET", "HEAD", "PUT", "POST", "DELETE"],
+    "responseHeader": ["Content-Type", "Access-Control-Allow-Origin"],
+    "maxAgeSeconds": 3600
+  }
+]

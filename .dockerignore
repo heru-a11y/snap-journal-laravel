@@ -8,3 +8,4 @@ storage
 public/storage
 docker-compose.yml
 README.md
+storage/app/google/*.json
