@@ -39,8 +39,12 @@ RUN composer install --no-dev --no-scripts --no-autoloader
 # Copy seluruh source code project
 COPY . .
 
-# --- Ambil hasil build JS/CSS dari Stage 1 ---
+# Copy hasil build JS/CSS dari Stage 1
 COPY --from=frontend_builder /app/public/build /var/www/public/build
+
+# ---------------------------------------------
+# Menyalin file config lokal ke folder sistem PHP
+COPY php-upload.ini /usr/local/etc/php/conf.d/zzz-upload.ini
 # ---------------------------------------------
 
 # Lanjutkan installasi Laravel
@@ -64,8 +68,7 @@ RUN php artisan config:clear
 # 2. Hapus database lama yang tercopy (penyebab mismatch) & buat baru
 RUN rm -f database/database.sqlite && touch database/database.sqlite
 
-# 3. Jalankan migrasi ulang agar struktur tabel UUID terbentuk dengan benar
-# (Menggunakan force karena environment production)
+# 3. Jalankan migrasi ulang
 RUN php artisan migrate:fresh --force
 # ---------------------------------------------
 
